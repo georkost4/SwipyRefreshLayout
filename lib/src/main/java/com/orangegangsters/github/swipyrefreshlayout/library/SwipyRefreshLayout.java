@@ -20,8 +20,6 @@ package com.orangegangsters.github.swipyrefreshlayout.library;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
-import android.support.v4.view.MotionEventCompat;
-import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -34,6 +32,11 @@ import android.view.animation.Animation.AnimationListener;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Transformation;
 import android.widget.AbsListView;
+
+import androidx.annotation.ColorInt;
+import androidx.annotation.ColorRes;
+import androidx.core.view.MotionEventCompat;
+import androidx.core.view.ViewCompat;
 
 /**
  * The SwipeRefreshLayout should be used whenever the user can refresh the
@@ -482,8 +485,8 @@ public class SwipyRefreshLayout extends ViewGroup {
      *
      * @param colorRes Resource id of the color.
      */
-    public void setProgressBackgroundColor(int colorRes) {
-        mCircleView.setBackgroundColor(colorRes);
+    public void setProgressBackgroundColor(@ColorRes int colorRes) {
+        mCircleView.setBackgroundColor(getResources().getColor(colorRes));
         mProgress.setBackgroundColor(getResources().getColor(colorRes));
     }
 
@@ -640,7 +643,7 @@ public class SwipyRefreshLayout extends ViewGroup {
                 return mTarget.getScrollY() > 0;
             }
         } else {
-            return ViewCompat.canScrollVertically(mTarget, -1);
+            return mTarget.canScrollVertically(-1);
         }
     }
 //    public boolean canChildScrollUp() {
@@ -1085,19 +1088,16 @@ public class SwipyRefreshLayout extends ViewGroup {
 //                break;
 //        }
         mCurrentTargetOffsetTop = mCircleView.getTop();
-        if (requiresUpdate && android.os.Build.VERSION.SDK_INT < 11) {
-            invalidate();
-        }
     }
 
     private void onSecondaryPointerUp(MotionEvent ev) {
-        final int pointerIndex = MotionEventCompat.getActionIndex(ev);
-        final int pointerId = MotionEventCompat.getPointerId(ev, pointerIndex);
+        final int pointerIndex = ev.getActionIndex();
+        final int pointerId = ev.getPointerId(pointerIndex);
         if (pointerId == mActivePointerId) {
             // This was our active pointer going up. Choose a new
             // active pointer and adjust accordingly.
             final int newPointerIndex = pointerIndex == 0 ? 1 : 0;
-            mActivePointerId = MotionEventCompat.getPointerId(ev, newPointerIndex);
+            mActivePointerId = ev.getPointerId(newPointerIndex);
         }
     }
 
